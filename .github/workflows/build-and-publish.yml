@@ -53,7 +53,15 @@ jobs:
             --timeout 360 \
             --skip-duplicate
 
-  # No update-version job: main is protected by a ruleset that requires a PR,
-  # so a direct push of the version bump would be rejected. The csproj <Version>
-  # is not used for publishing anyway; build-pack derives the next version from
-  # nuget.org and passes it to dotnet pack via /p:Version.
+  # Bump the committed version in the csproj to the just-published version.
+  # No NuGet credentials needed, so this stays in the shared reusable workflow.
+  update-version:
+    needs: [build-pack, publish]
+    if: github.event.pull_request.merged == true
+    uses: Bounteous-Inc/bounteous-dotnet-common-workflows/.github/workflows/update-version.yml@main
+    permissions:
+      contents: write
+    with:
+      nuget-package-name: 'Bounteous.Data.SQLite'
+      csproj-path: './src/Bounteous.Data.SQLite/Bounteous.Data.SQLite.csproj'
+      fallback-version: ${{ needs.build-pack.outputs.next_version }}
