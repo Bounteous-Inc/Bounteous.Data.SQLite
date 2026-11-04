@@ -1,0 +1,67 @@
+name: Bounteous.Data.SQLite
+
+on:
+  pull_request:
+    types: [ closed ]
+    branches: [ main ]
+
+jobs:
+  # Build, test, version, tag, and pack via the shared reusable workflow.
+  # It uploads the .nupkg as the "nuget-package" artifact.
+  build-pack:
+    if: github.event.pull_request.merged == true
+    uses: Bounteous-Inc/bounteous-dotnet-common-workflows/.github/workflows/build-and-publish-to-nuget.yml@main
+    with:
+      csproj-path: './src/Bounteous.Data.SQLite/Bounteous.Data.SQLite.csproj'
+      nuget-package-name: 'Bounteous.Data.SQLite'
+      dotnet-version: '10.0.x'
+      release-path: 'net10.0'
+      build-configuration: 'Release'
+
+  # Publish must run in THIS repo's own workflow (not the reusable one).
+  # NuGet Trusted Publishing cannot match an org-owned package policy when
+  # NuGet/login runs inside a reusable workflow (NuGet/login issue #6), so the
+  # OIDC login + push are done directly here, where job_workflow_ref resolves
+  # to this repository and matches the trust policy.
+  publish:
+    needs: build-pack
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - name: Download NuGet package
+        uses: actions/download-artifact@v4
+        with:
+          name: nuget-package
+          path: ./packages
+      - name: NuGet login (OIDC → temp API key)
+        uses: NuGet/login@v1
+        id: nuget-login
+        with:
+          user: Krogg.Bounteous
+      - name: Publish to NuGet
+        run: |
+          PACKAGE_FILE=$(find ./packages -name "*.nupkg" | head -n 1)
+          if [ -z "$PACKAGE_FILE" ]; then
+            echo "Error: No .nupkg file found in ./packages directory"
+            exit 1
+          fi
+          dotnet nuget push "$PACKAGE_FILE" \
+            --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}" \
+            --source "https://api.nuget.org/v3/index.json" \
+            --timeout 360 \
+            --skip-duplicate
+
+  # Bump the committed version in the csproj to the just-published version.
+  # No NuGet credentials needed, so this stays in the shared reusable workflow.
+  update-version:
+    needs: [build-pack, publish]
+    if: github.event.pull_request.merged == true
+    uses: Bounteous-Inc/bounteous-dotnet-common-workflows/.github/workflows/update-version.yml@main
+    permissions:
+      contents: write
+    with:
+      nuget-package-name: 'Bounteous.Data.SQLite'
+      csproj-path: './src/Bounteous.Data.SQLite/Bounteous.Data.SQLite.csproj'
+      fallback-version: ${{ needs.build-pack.outputs.next_version }}
