@@ -105,9 +105,11 @@ keepAlive.Open();
 ## Dependencies
 
 - `Bounteous.Data` 0.0.31
-- `Microsoft.EntityFrameworkCore.Sqlite` 10.0.9
-- `SQLitePCLRaw.bundle_e_sqlite3` 2.1.14 (pinned above the transitive 2.1.11, which has advisory
-  GHSA-2m69-gcr7-jv3q)
+- `Microsoft.EntityFrameworkCore.Sqlite` 10.0.14
+- `SQLitePCLRaw.bundle_e_sqlite3` 3.0.5 (pinned so the bundled native SQLite stays ahead of the
+  version EF Core pulls transitively)
+
+Dependabot keeps these current.
 
 ## Build and test
 

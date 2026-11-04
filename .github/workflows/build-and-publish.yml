@@ -55,6 +55,8 @@ jobs:
 
   # Bump the committed version in the csproj to the just-published version.
   # No NuGet credentials needed, so this stays in the shared reusable workflow.
+  # main is protected by a ruleset that requires PRs and exempts deploy keys, so
+  # the bump is pushed with this repo's write deploy key, not GITHUB_TOKEN.
   update-version:
     needs: [build-pack, publish]
     if: github.event.pull_request.merged == true
@@ -65,3 +67,5 @@ jobs:
       nuget-package-name: 'Bounteous.Data.SQLite'
       csproj-path: './src/Bounteous.Data.SQLite/Bounteous.Data.SQLite.csproj'
       fallback-version: ${{ needs.build-pack.outputs.next_version }}
+    secrets:
+      deploy-key: ${{ secrets.UPDATE_VERSION_DEPLOY_KEY }}
