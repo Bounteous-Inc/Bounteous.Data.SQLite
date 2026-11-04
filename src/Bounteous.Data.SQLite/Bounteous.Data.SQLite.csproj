@@ -4,7 +4,7 @@
         <TargetFramework>net10.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Version>0.0.1</Version>
+        <Version>0.0.2</Version>
         <PackageId>Bounteous.Data.SQLite</PackageId>
         <Authors>Bounteous</Authors>
         <Company>Xerris Inc.</Company>
