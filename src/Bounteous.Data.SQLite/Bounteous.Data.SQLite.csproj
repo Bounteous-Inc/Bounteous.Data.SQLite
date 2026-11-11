@@ -13,14 +13,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Bounteous.Data" Version="0.0.31" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.14" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.14">
+      <PackageReference Include="Bounteous.Data" Version="0.0.33" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.15" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.15">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       </PackageReference>
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.14" />
-      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.14" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.15" />
+      <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.15" />
       <!-- Pinned so the bundled native SQLite stays ahead of what EF Core pulls transitively.
            Originally added because EF Core 10.0.9 pulled 2.1.11 (GHSA-2m69-gcr7-jv3q). -->
       <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.5" />
